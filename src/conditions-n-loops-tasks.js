@@ -308,18 +308,17 @@ function isContainNumber(num, digit) {
  *  [1, 2, 3, 4, 5] => -1   => no balance element
  */
 function getBalanceIndex(arr) {
+  let totalSum = 0;
   for (let i = 0; i < arr.length; i += 1) {
-    let leftSum = 0;
-    let rightSum = 0;
-    for (let j = 0; j < i; j += 1) {
-      leftSum += arr[j];
-    }
-    for (let k = i + 1; k < arr.length; k += 1) {
-      rightSum += arr[k];
-    }
-    if (leftSum === rightSum) {
+    totalSum += arr[i];
+  }
+  let leftSum = 0;
+  for (let i = 0; i < arr.length; i += 1) {
+    totalSum -= arr[i];
+    if (leftSum === totalSum) {
       return i;
     }
+    leftSum += arr[i];
   }
   return -1;
 }
@@ -432,18 +431,29 @@ function rotateMatrix(matrix) {
  */
 function sortByAsc(arr) {
   const newArr = arr;
-  let swapped;
-  do {
-    swapped = false;
-    for (let i = 0; i < newArr.length - 1; i += 1) {
-      if (newArr[i] > newArr[i + 1]) {
-        const temp = newArr[i];
-        newArr[i] = newArr[i + 1];
-        newArr[i + 1] = temp;
-        swapped = true;
+  function swap(i, j) {
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  function partition(left, right) {
+    const pivot = newArr[right];
+    let i = left - 1;
+    for (let j = left; j < right; j += 1) {
+      if (newArr[j] < pivot) {
+        i += 1;
+        swap(i, j);
       }
     }
-  } while (swapped);
+    swap(i + 1, right);
+    return i + 1;
+  }
+  function quickSort(left, right) {
+    if (left < right) {
+      const pivotIndex = partition(left, right);
+      quickSort(left, pivotIndex - 1);
+      quickSort(pivotIndex + 1, right);
+    }
+  }
+  quickSort(0, newArr.length - 1);
   return newArr;
 }
 
@@ -465,20 +475,17 @@ function sortByAsc(arr) {
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
 function shuffleChar(str, iterations) {
-  const result = new Array(str.length);
-  for (let i = 0; i < str.length; i += 1) {
+  const len = str.length;
+  const result = new Array(len);
+  for (let i = 0; i < len; i += 1) {
     let newPos = i;
     for (let j = 0; j < iterations; j += 1) {
-      if (newPos % 2 === 0) {
-        newPos /= 2;
-      } else {
-        newPos = (str.length + newPos - 1) / 2;
-      }
+      newPos = newPos % 2 === 0 ? newPos / 2 : (len + newPos - 1) / 2;
     }
     result[newPos] = str[i];
   }
   let resulString = '';
-  for (let i = 0; i < result.length; i += 1) {
+  for (let i = 0; i < len; i += 1) {
     resulString += result[i];
   }
   return resulString;
